@@ -239,6 +239,7 @@ router.get('/allReqs',function(req,res,next){
         return false;
     }
     mongoose.model('Requests').find({},function(err,data){
+        console.log('REQUEST',err,data)
         res.send(data);
     })
 })

@@ -78,11 +78,10 @@
                     <hr>
                     <div class='is-size-3'>About You</div>
                     <div class="field is-actually-full">
-                        <label class="label notification">Account Name</label>
+                        <label class="label notification">Account/Char Name</label>
                         <div class="control">
-                            <input class="input" type="text" placeholder="Eir Stegalkin.1234" ng-model='currReqSong.acct' ng-keyup='chkAcct()'>
+                            <input class="input" type="text" placeholder="Eir Stegalkin.1234" ng-model='currReqSong.acct'>
                         </div>
-                        <div class='notification is-danger' ng-if='nameErr'>This doesn't look like a valid account name to me. Account names are usually in the format <pre>Name.####</pre> You can continue, but I <i>might</i> not be able to find you!</div>
                     </div>
                     <br>
                     <div class="field is-actually-full">
@@ -96,9 +95,9 @@
                     </div>
                     <br>
                     <div class="field is-actually-full">
-                        <label class="label notification">Time (EST)</label>
+                        <label class="label notification">Date/Time</label>
                         <div class="control has-icons-left">
-                           <input class="input is-medium" type="time" placeholder="Time" ng-model='currReqSong.time'>
+                           <input class="input is-medium" type="datetime-local" placeholder="time" ng-model='currReqSong.time'>
   							<span class="icon is-left">
     							<i class="fas fa-clock"></i>
   							</span>

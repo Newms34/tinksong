@@ -40,25 +40,25 @@ app.controller('tinkCont', function($scope, $http) {
                 body: "Your request has been sent! I'll contact you in game!"
             };
             // send the song req to Tink!
-            $http.post('/songs/req',$scope.currReqSong)
-                .then(function(r){
+            $http.post('/songs/req', $scope.currReqSong)
+                .then(function(r) {
                     console.log(r);
                 })
         }
         //user sends request!
     }
-    $scope.acceptReqResult = function(){
+    $scope.acceptReqResult = function() {
         $scope.currReqSong.msg = null;
-        if($scope.currReqSong.problem){
+        if ($scope.currReqSong.problem) {
             //there was an issue with the request. Reset the request box so user can try again
-            $scope.requesting=true;
-        }else{
+            $scope.requesting = true;
+        } else {
             $scope.currReqSong = {};
         }
     }
-    $scope.cancelReq = function(){
+    $scope.cancelReq = function() {
         $scope.currReqSong = {};
-        $scope.requesting=false;
+        $scope.requesting = false;
     }
 });
 
@@ -105,7 +105,7 @@ app.controller('tinkAdmin', function($scope, $http) {
     $scope.suggested = {};
     //array getter functions
     $scope.getGenres = function(i) {
-        if(!i){
+        if (!i) {
             $scope.suggested.genre = [];
             return false;
         }
@@ -114,17 +114,17 @@ app.controller('tinkAdmin', function($scope, $http) {
         })
     }
     $scope.getArtists = function(i) {
-        if(!i){
+        if (!i) {
             $scope.suggested.artist = [];
             return false;
         }
         $http.get('/songs/artists/' + i).then(r => {
             $scope.suggested.artist = r.data;
-            console.log(r.data,)
+            console.log(r.data, )
         })
     }
     $scope.getAlbums = function(i) {
-        if(!i){
+        if (!i) {
             $scope.suggested.album = [];
             return false;
         }
@@ -133,7 +133,7 @@ app.controller('tinkAdmin', function($scope, $http) {
         })
     }
     $scope.getTags = function(i) {
-        if(!i){
+        if (!i) {
             $scope.suggested.tags = [];
             return false;
         }
@@ -141,11 +141,11 @@ app.controller('tinkAdmin', function($scope, $http) {
             $scope.suggested.tags = r.data;
         })
     }
-    $scope.acceptSug = function(v,arr){
-        $scope.suggested[arr]=[];
-        if(arr!='tags'){
-            $scope.newSong[arr]=v;
-        }else{
+    $scope.acceptSug = function(v, arr) {
+        $scope.suggested[arr] = [];
+        if (arr != 'tags') {
+            $scope.newSong[arr] = v;
+        } else {
             $scope.newSong.tags.push(v);
             $scope.candTag = '';
             $scope.$digest();
@@ -174,14 +174,14 @@ app.controller('tinkAdmin', function($scope, $http) {
                 alert("Your song has too little info. Please include more!");
                 return false;
             }
-            console.log('NEW SONG',s);
+            console.log('NEW SONG', s);
             // var theSong = angular.copy(s);
             // s.album = $scope.
             $http.post('/songs/new', s)
                 .then(r => {
                     //either we get an error back (something went horribly wrong) or a call to refresh the song list (since we just added one)
                     $scope.clearSong();
-                    if (!r.data||r.data=='err') {
+                    if (!r.data || r.data == 'err') {
                         alert('Error adding song! Sorry!')
                     } else {
                         $scope.refSongs();
@@ -199,5 +199,37 @@ app.controller('tinkAdmin', function($scope, $http) {
                 })
         }
     }
-
+    $scope.getReqs = function() {
+        $http.get('/songs/allReqs')
+            .then(r => {
+                console.log('requests', r)
+                var now = new Date().getTime();
+                $scope.requests = r.data.filter(f => {
+                    return new Date(f.time) > now;
+                });
+            })
+    }
+    $scope.getReqs();
+    $scope.renderDate = function(r) {
+        return new Date(r).toLocaleString()
+    }
+    $scope.getSongId = function(id) {
+        for (var i = 0; i < $scope.songs.length; i++) {
+            if ($scope.songs[i].id == id) {
+                return $scope.songs[i]
+            }
+        }
+    }
+    $scope.removeReq = function(id) {
+        if (confirm('Are you absolutely sure you wish to remove this request?')) {
+            $http.get('/songs/removeReq/' + id).then(r => {
+                $scope.getReqs();
+            })
+        }
+    }
+    $scope.scrollTo = function(d) {
+        $('html, body').animate({
+            scrollTop: $("#"+d).offset().top-50
+        }, 200);
+    }
 })
