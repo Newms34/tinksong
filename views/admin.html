@@ -26,52 +26,43 @@
                         </div>
                         <br>
                         <p class="control is-size-4">Artist</p>
-                        <div class="field has-addons">
-                            <p class="control is-expanded">
-                                <md-autocomplete md-no-cache="true" md-selected-item="newSong.artist" md-items="item in getArtists(aText)" md-search-text='aText' placeholder='Who wrote it'>
-                                    <md-item-template>
-                                        <span md-highlight-text="aText">{{item}}</span>
-                                    </md-item-template>
-                                </md-autocomplete>
+                        <div class="field">
+                            <p class="control is-expanded is-actually-full">
+                                <input class="input" type='text' placeholder='Who wrote it' ng-model='newSong.artist' ng-change='getArtists(newSong.artist)'>
                             </p>
+                            <div class='is-actually-full message sug' ng-repeat='sa in suggested.artist' ng-click='acceptSug(sa,"artist")'>{{sa}}</div>
                         </div>
                         <br>
                         <p class="control is-size-4">Album</p>
-                        <div class="field has-addons">
-                            <p class="control is-expanded">
-                                <md-autocomplete md-no-cache="true" md-selected-item="newSong.album" md-items="item in getAlbums(bText)" md-search-text='bText' placeholder='The album/collection'>
-                                    <md-item-template>
-                                        <span md-highlight-text="bText">{{item}}</span>
-                                    </md-item-template>
-                                </md-autocomplete>
+                        <div class="field">
+                            <p class="control is-expanded is-actually-full">
+                                <input class="input" type='text' placeholder='The album/collection' ng-model='newSong.album' ng-change='getAlbums(newSong.album)'>
                             </p>
+                            <div class='is-actually-full message sug' ng-repeat='sb in suggested.album' ng-click='acceptSug(sb,"album")'>{{sb}}</div>
                         </div>
                         <br>
                         <p class="control is-size-4">Genre</p>
-                        <div class="field has-addons">
-                            <p class="control is-expanded">
-                                <md-autocomplete md-no-cache="true" md-selected-item="newSong.genre" md-items="item in getGenres(gText)" md-search-text='gText' placeholder='What kind of song it is'>
-                                    <md-item-template>
-                                        <span md-highlight-text="gText">{{item}}</span>
-                                    </md-item-template>
-                                </md-autocomplete>
+                        <div class="field">
+                            <p class="control is-expanded is-actually-full">
+                                <input class="input" type='text' placeholder='What kind of song it is' ng-model='newSong.genre' ng-change='getGenres(newSong.genre)'>
                             </p>
+                            <div class='is-actually-full message sug' ng-repeat='ge in suggested.genre' ng-click='acceptSug(ge,"genre")'>{{ge}}</div>
                         </div>
                         <br>
                         <p class="control is-size-4">Add Tags</p>
                         <div class="field has-addons">
-                            <p class="control is-expanded">
-                                <md-autocomplete md-no-cache="true" md-selected-item="newTag" md-items="item in getTags(tText)" md-search-text='tText' placeholder='New Tag' placeholder='A descriptive word or phrase'>
-                                    <md-item-template>
-                                        <span md-highlight-text="tText">{{item}}</span>
-                                    </md-item-template>
-                                </md-autocomplete>
+                            <p class="control is-expanded is-actually-full">
+                                <input class="input" type='text' placeholder='A descriptive word' ng-model='candTag' ng-change='getTags(candTag)'>
                             </p>
                             <p class="control">
-                                <button class="button is-success is-fullheight" ng-click='chTag(1,newTag)'>
+                                <button class="button is-success is-fullheight" ng-click='chTag(1,candTag)'>
                                     <i class='fa fa-tags'></i> Add a tag
                                 </button>
                             </p>
+                            
+                        </div>
+                        <div class='field'>
+                            <div class='is-actually-full message sug' ng-repeat='tg in suggested.tags' ng-click='acceptSug(tg,"tags")'>{{tg}}</div>
                         </div>
                         <br>
                         <div ng-if='newSong.tags.length'>

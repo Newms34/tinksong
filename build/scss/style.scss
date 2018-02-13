@@ -72,3 +72,12 @@ input::placeholder {
 .tink-pic {
     background: url('../img/tink2.jpg')
 }
+.sug{
+	background:#d5d5ff;
+	margin-bottom:0!important;
+	transition-duration:.5s;
+	cursor:pointer;
+	&:hover{
+		background:#ccd
+	}
+}
