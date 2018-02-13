@@ -68,6 +68,7 @@ router.post('/new', function(req, res, next) {
     })
 })
 router.get('/all', function(req, res, next) {
+    console.log('SONG!\n',mongoose.model('Song'),'\nEND SONG\n')
     mongoose.model('Song').find({}, function(err, data) {
         if (err) {
             res.send('err')
