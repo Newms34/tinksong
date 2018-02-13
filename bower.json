@@ -1,0 +1,36 @@
+{
+  "name": "conkr",
+  "description": "Multiplayer Risk port",
+  "main": "index.js",
+  "authors": [
+    "David Newman"
+  ],
+  "license": "ISC",
+  "keywords": [
+    "game",
+    "risk",
+    "conquer",
+    "strategy",
+    "chat",
+    "port"
+  ],
+  "homepage": "https://github.com/newms34/conkr",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular": "^1.6.1",
+    "angular-sanitize": "^1.6.1",
+    "bulma": "^0.6.2",
+    "angularjs-autocomplete": "^0.4.8",
+    "angular-material": "^1.1.7"
+  },
+  "resolutions": {
+    "angular": "^1.6.1"
+  }
+}

@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Tink Songs</title>
+    <link rel="stylesheet" type="text/css" href="/bulma/css/bulma.css">
+    <link rel="stylesheet" type="text/css" href="/angular-material/angular-material.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/styles.css">
+</head>
+
+<body id='main-bod' ng-app='tinkApp' ng-controller='tinkCont' ng-cloak>
+    <div class='columns' ng-if='!requesting'>
+        <div class='column is-one-fifth'></div>
+        <table class='table column is-three-fifths'>
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Artist</th>
+                    <th>Album</th>
+                    <th>Genre</th>
+                    <th>Tags</th>
+                    <th>&nbsp;</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat='sg in songs'>
+                    <td>{{sg.title||'(none)'}}</td>
+                    <td>{{sg.artist||'(none)'}}</td>
+                    <td>{{sg.album||'(none)'}}</td>
+                    <td>{{sg.genre||'(none)'}}</td>
+                    <td>
+                        <ul ng-if='sg.tags.length'>
+                            <li ng-repeat='t in sg.tags'><i class='fa fa-check'></i> {{t}}</li>
+                        </ul>
+                        <span ng-if='!sg.tags.length'>(none)</span>
+                    </td>
+                    <td>
+                        <button class='button is-info' ng-click='reqSong(sg);'>Request</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div ng-if='requesting' class='columns req-box'>
+        <div class='column is-one-fifth'></div>
+        <div class='column is-three-fifths panel'>
+            <div class='panel-heading is-size-3'>Request a Song</div>
+            <div class='panel-block light-bg'>
+                <form class='is-actually-full'>
+                    <div class='is-size-3'>Song Info</div>
+                    <div class="field is-actually-full">
+                        <label class="label notification">Title</label>
+                        <div class="control">
+                            {{currReqSong.title}}
+                        </div>
+                    </div>
+                    <br>
+                    <div class="field is-actually-full">
+                        <label class="label notification">Artist</label>
+                        <div class="control">
+                            {{currReqSong.artist||'(none)'}}
+                        </div>
+                    </div>
+                    <br>
+                    <div class="field is-actually-full">
+                        <label class="label notification">Album</label>
+                        <div class="control">
+                            {{currReqSong.album||'(none)'}}
+                        </div>
+                    </div>
+                    <br>
+                    <div class="field is-actually-full">
+                        <label class="label notification">Genre</label>
+                        <div class="control">
+                            {{currReqSong.genre||'(none)'}}
+                        </div>
+                    </div>
+                    <hr>
+                    <div class='is-size-3'>About You</div>
+                    <div class="field is-actually-full">
+                        <label class="label notification">Account Name</label>
+                        <div class="control">
+                            <input class="input" type="text" placeholder="Eir Stegalkin.1234" ng-model='currReqSong.acct' ng-keyup='chkAcct()'>
+                        </div>
+                        <div class='notification is-danger' ng-if='nameErr'>This doesn't look like a valid account name to me. Account names are usually in the format <pre>Name.####</pre> You can continue, but I <i>might</i> not be able to find you!</div>
+                    </div>
+                    <br>
+                    <div class="field is-actually-full">
+                        <label class="label notification">City</label>
+                        <div class="control">
+                            <div class="select is-actually-full">
+                                <select class='is-actually-full' ng-init = "currReqSong.city='Rata Sum'" ng-options='ct for ct in cities' ng-model='currReqSong.city'>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <br>
+                    <div class="field is-actually-full">
+                        <label class="label notification">Time (EST)</label>
+                        <div class="control has-icons-left">
+                           <input class="input is-medium" type="time" placeholder="Time" ng-model='currReqSong.time'>
+  							<span class="icon is-left">
+    							<i class="fas fa-clock"></i>
+  							</span>
+                        </div>
+                    </div>
+                    <br>
+                    <div class="field is-actually-full">
+                        <div class="control is-actually-full">
+                            <button class='button is-info is-actually-full is-size-6'  ng-click='doReqSong()'><i class='fa fa-headphones'></i> Request!</button>
+                        </div>
+                        <div class="control is-actually-full">
+                            <button class='button is-danger is-actually-full is-size-6'  ng-click='cancelReq()'><i class='fa fa-times'></i> Cancel</button>
+                        </div>
+                    </div>
+                </form>
+                <!-- <div id='tink-pic'></div> -->
+            </div>
+        </div>
+        <div class='bg'></div>
+    </div>
+    <div class='columns req-box' ng-if='currReqSong.msg'>
+    	<div class='column is-one-third'></div>
+    	<div class='column is-one-third message' ng-class="{'is-danger':currReqSong.problem, 'is-success':!currReqSong.problem}">
+    		<div class='message-header'>
+    			{{currReqSong.msg.title}}
+    		</div>
+    		<div class='message-body'>
+    			{{currReqSong.msg.body}}
+    			<br><br>
+    			<button class='button' style='bottom:5px;' ng-class="{'is-danger':currReqSong.problem, 'is-success':!currReqSong.problem}" ng-click='acceptReqResult();'>Okay</button>
+    		</div>
+    	</div>
+    	<div class='bg'></div>
+    </div>
+    <script defer src="https://use.fontawesome.com/releases/v5.0.6/js/all.js"></script>
+    <script src="/jquery/dist/jquery.min.js"></script>
+    <script src="/angular/angular.min.js"></script>
+    <script src="/angular-animate/angular-animate.min.js"></script>
+    <script src="/angular-aria/angular-aria.min.js"></script>
+    <script src="/angular-material/angular-material.js"></script>
+    <script src="/angular-sanitize/angular-sanitize.min.js"></script>
+    <script src="./js/all.js"></script>
+
+</html>

@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Tink Songs: Admin</title>
+    <link rel="stylesheet" type="text/css" href="/bulma/css/bulma.css">
+    <link rel="stylesheet" type="text/css" href="/angular-material/angular-material.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/styles.css">
+</head>
+
+<body ng-app='tinkApp' ng-controller='tinkAdmin' ng-cloak>
+    <div id='admin' ng-if='verified'>
+        <button class='button is-success' ng-show='!add' ng-click='add=!add'>Add Song</button>
+        <div ng-show='add' class='column'>
+            <div class='panel'>
+                <div class='panel-heading is-size-3'>
+                    Add Song <span class='button is-danger is-pulled-right' ng-click='add=!add;clearSong();'>x</span>
+                </div>
+                <div class='panel-block light-bg'>
+                    <form class='control'>
+                        <p class="control is-size-4">Title</p>
+                        <div class="field">
+                            <p class="control is-expanded">
+                                <input class="input" type="text" placeholder="What it's called" ng-model='newSong.title'>
+                            </p>
+                        </div>
+                        <br>
+                        <p class="control is-size-4">Artist</p>
+                        <div class="field has-addons">
+                            <p class="control is-expanded">
+                                <md-autocomplete md-no-cache="true" md-selected-item="newSong.artist" md-items="item in getArtists(aText)" md-search-text='aText' placeholder='Who wrote it'>
+                                    <md-item-template>
+                                        <span md-highlight-text="aText">{{item}}</span>
+                                    </md-item-template>
+                                </md-autocomplete>
+                            </p>
+                        </div>
+                        <br>
+                        <p class="control is-size-4">Album</p>
+                        <div class="field has-addons">
+                            <p class="control is-expanded">
+                                <md-autocomplete md-no-cache="true" md-selected-item="newSong.album" md-items="item in getAlbums(bText)" md-search-text='bText' placeholder='The album/collection'>
+                                    <md-item-template>
+                                        <span md-highlight-text="bText">{{item}}</span>
+                                    </md-item-template>
+                                </md-autocomplete>
+                            </p>
+                        </div>
+                        <br>
+                        <p class="control is-size-4">Genre</p>
+                        <div class="field has-addons">
+                            <p class="control is-expanded">
+                                <md-autocomplete md-no-cache="true" md-selected-item="newSong.genre" md-items="item in getGenres(gText)" md-search-text='gText' placeholder='What kind of song it is'>
+                                    <md-item-template>
+                                        <span md-highlight-text="gText">{{item}}</span>
+                                    </md-item-template>
+                                </md-autocomplete>
+                            </p>
+                        </div>
+                        <br>
+                        <p class="control is-size-4">Add Tags</p>
+                        <div class="field has-addons">
+                            <p class="control is-expanded">
+                                <md-autocomplete md-no-cache="true" md-selected-item="newTag" md-items="item in getTags(tText)" md-search-text='tText' placeholder='New Tag' placeholder='A descriptive word or phrase'>
+                                    <md-item-template>
+                                        <span md-highlight-text="tText">{{item}}</span>
+                                    </md-item-template>
+                                </md-autocomplete>
+                            </p>
+                            <p class="control">
+                                <button class="button is-success is-fullheight" ng-click='chTag(1,newTag)'>
+                                    <i class='fa fa-tags'></i> Add a tag
+                                </button>
+                            </p>
+                        </div>
+                        <br>
+                        <div ng-if='newSong.tags.length'>
+                            <div class='is-size-4'>Tags</div>
+                            <div ng-repeat='ns in newSong.tags' class='columns is-fullwidth'>
+                                <div class='column is-four-fifths'>{{ns}}</div>
+                                <div class='column is-pulled-right'>
+                                    <button class='button is-danger is-small' ng-click='chTag(0,ns)'>x</button>
+                                </div>
+                            </div>
+                        </div>
+                        <br>
+                        <div class='columns is-fullwidth'>
+                            <div class='column is-one-third'>&nbsp;</div>
+                            <button class='column is-one-third button is-success is-size-5' ng-click='doAddSong(newSong)'><i class='fa fa-music'></i> Add Song</button>
+                        </div>
+                        <br>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <br>
+        <div class='columns'>
+            <div class='column is-one-fifth'></div>
+            <div class='column is-three-fifths light-bg' ng-if='songs.length'>
+                <div class='is-size-3'>Songs</div>
+                <hr>
+                <table class='table'>
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Artist</th>
+                            <th>Album</th>
+                            <th>Genre</th>
+                            <th>Tags</th>
+                            <th>Requests</th>
+                            <th>&nbsp;</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat='sg in songs'>
+                            <td>{{sg.title||'(none)'}}</td>
+                            <td>{{sg.artist||'(none)'}}</td>
+                            <td>{{sg.album||'(none)'}}</td>
+                            <td>{{sg.genre||'(none)'}}</td>
+                            <td>
+                                <ul ng-if='sg.tags.length'>
+                                    <li ng-repeat='t in sg.tags'><i class='fa fa-check'></i> {{t}}</li>
+                                </ul>
+                                <span ng-if='!sg.tags.length'>(none)</span>
+                            </td>
+                            <td>{{td.reqd||0}}</td>
+                            <td><button class='button is-danger' ng-click='removeSong(sg.id)'>Remove</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <script defer src="https://use.fontawesome.com/releases/v5.0.6/js/all.js"></script>
+    <script src="/jquery/dist/jquery.min.js"></script>
+    <script src="/angular/angular.min.js"></script>
+    <script src="/angular-animate/angular-animate.min.js"></script>
+    <script src="/angular-aria/angular-aria.min.js"></script>
+    <script src="/angular-material/angular-material.js"></script>
+    <script src="/angular-sanitize/angular-sanitize.min.js"></script>
+    <script src="./js/all.js"></script>
+</body>
+
+</html>
