@@ -6,8 +6,8 @@ var express = require('express'),
     bcrypt = require('bcrypt'),
     tink = {
         u: 'CASHette',
-        pr: 'SAndBuReCRoW', //DELET THIS
-        p: '$2a$10$DX/FyRMu.FSDvopImIhPFO703YAU5778bQRXDfUh07NqFkcbrpK96'
+        pr: 'SandBureCrow', //DELET THIS
+        p: '$2a$10$TkmXzEON9sHWP8j81vt77OCoV0A936r3L0iTKZeCDFnZOxMilvg32'
     }; //shhhhh!
 router.use('/songs', require('./song'));
 

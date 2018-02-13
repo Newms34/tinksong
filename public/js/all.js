@@ -6,6 +6,7 @@ app.controller('tinkCont', function($scope, $http) {
                 return false;
             }
             $scope.songs = r.data;
+            $scope.filtSongs(null);
         })
     }
     $scope.refSongs();
@@ -60,6 +61,22 @@ app.controller('tinkCont', function($scope, $http) {
         $scope.currReqSong = {};
         $scope.requesting = false;
     }
+    $scope.filtSongs = function(r){
+        console.log('RAW SONGS',$scope.songs,r)
+        if(!r||r==''||!r.trim()){
+            console.log('no filter')
+            $scope.songsFilt = angular.copy($scope.songs);
+        }else{
+            console.log('filter',r)
+            $scope.songsFilt = $scope.songs.filter(f=>{
+                r=r.toLowerCase();
+                return f.title.toLowerCase().indexOf(r)>-1 || f.genre.toLowerCase().indexOf(r)>-1 || f.album.toLowerCase().indexOf(r)>-1 || f.artist.toLowerCase().indexOf(r)>-1||f.tags.filter(ft=>{
+                    return ft.toLowerCase().indexOf(r)>-1;
+                }).length;
+            })
+        }
+    }
+    
 });
 
 //admin
@@ -75,6 +92,7 @@ app.controller('tinkAdmin', function($scope, $http) {
                     pw = prompt('Password?', '');
                 if (!us || !pw || pw == '' || us == '') {
                     console.log('redirect to home')
+                    alert('Missing either password or username')
                     window.location.assign('./')
                 } else {
                     $http.post('/login', { un: us, pw: pw }).then(function(r) {

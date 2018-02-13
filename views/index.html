@@ -11,35 +11,47 @@
 <body id='main-bod' ng-app='tinkApp' ng-controller='tinkCont' ng-cloak>
     <div class='columns' ng-if='!requesting'>
         <div class='column is-one-fifth'></div>
-        <table class='table column is-three-fifths'>
-            <thead>
-                <tr>
-                    <th>Title</th>
-                    <th>Artist</th>
-                    <th>Album</th>
-                    <th>Genre</th>
-                    <th>Tags</th>
-                    <th>&nbsp;</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr ng-repeat='sg in songs'>
-                    <td>{{sg.title||'(none)'}}</td>
-                    <td>{{sg.artist||'(none)'}}</td>
-                    <td>{{sg.album||'(none)'}}</td>
-                    <td>{{sg.genre||'(none)'}}</td>
-                    <td>
-                        <ul ng-if='sg.tags.length'>
-                            <li ng-repeat='t in sg.tags'><i class='fa fa-check'></i> {{t}}</li>
-                        </ul>
-                        <span ng-if='!sg.tags.length'>(none)</span>
-                    </td>
-                    <td>
-                        <button class='button is-info' ng-click='reqSong(sg);'>Request</button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+        <div class='column is-three-fifths'>
+            <table class='table is-actually-full'>
+                <thead>
+                    <tr class='message'>
+                        <th>Search</th>
+                        <th colspan='4'><input type="text" class='input is-actually-full' ng-model='searchText' ng-change='filtSongs(searchText)'></th>
+                        <th><button class='button is-danger'>x</button></th>
+                    </tr>
+                    <tr>
+                        <th>Title</th>
+                        <th>Artist</th>
+                        <th>Album</th>
+                        <th>Genre</th>
+                        <th>Tags</th>
+                        <th>&nbsp;</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat='sg in songsFilt'>
+                        <td>{{sg.title||'(none)'}}</td>
+                        <td>{{sg.artist||'(none)'}}</td>
+                        <td>{{sg.album||'(none)'}}</td>
+                        <td>{{sg.genre||'(none)'}}</td>
+                        <td>
+                            <ul ng-if='sg.tags.length'>
+                                <li ng-repeat='t in sg.tags'><i class='fa fa-check'></i> {{t}}</li>
+                            </ul>
+                            <span ng-if='!sg.tags.length'>(none)</span>
+                        </td>
+                        <td>
+                            <button class='button is-info' ng-click='reqSong(sg);'>Request</button>
+                        </td>
+                    </tr>
+                </tbody>
+                <tbody ng-if='!songsFilt.length'>
+                    <tr>
+                        <td colspan='6'>No songs match your query!</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
     <div ng-if='requesting' class='columns req-box'>
         <div class='column is-one-fifth'></div>
@@ -88,7 +100,7 @@
                         <label class="label notification">City</label>
                         <div class="control">
                             <div class="select is-actually-full">
-                                <select class='is-actually-full' ng-init = "currReqSong.city='Rata Sum'" ng-options='ct for ct in cities' ng-model='currReqSong.city'>
+                                <select class='is-actually-full' ng-init="currReqSong.city='Rata Sum'" ng-options='ct for ct in cities' ng-model='currReqSong.city'>
                                 </select>
                             </div>
                         </div>
@@ -97,19 +109,19 @@
                     <div class="field is-actually-full">
                         <label class="label notification">Date/Time</label>
                         <div class="control has-icons-left">
-                           <input class="input is-medium" type="datetime-local" placeholder="time" ng-model='currReqSong.time'>
-  							<span class="icon is-left">
-    							<i class="fas fa-clock"></i>
-  							</span>
+                            <input class="input is-medium" type="datetime-local" placeholder="time" ng-model='currReqSong.time'>
+                            <span class="icon is-left">
+                                <i class="fas fa-clock"></i>
+                            </span>
                         </div>
                     </div>
                     <br>
                     <div class="field is-actually-full">
                         <div class="control is-actually-full">
-                            <button class='button is-info is-actually-full is-size-6'  ng-click='doReqSong()'><i class='fa fa-headphones'></i> Request!</button>
+                            <button class='button is-info is-actually-full is-size-6' ng-click='doReqSong()'><i class='fa fa-headphones'></i> Request!</button>
                         </div>
                         <div class="control is-actually-full">
-                            <button class='button is-danger is-actually-full is-size-6'  ng-click='cancelReq()'><i class='fa fa-times'></i> Cancel</button>
+                            <button class='button is-danger is-actually-full is-size-6' ng-click='cancelReq()'><i class='fa fa-times'></i> Cancel</button>
                         </div>
                     </div>
                 </form>
@@ -119,18 +131,19 @@
         <div class='bg'></div>
     </div>
     <div class='columns req-box' ng-if='currReqSong.msg'>
-    	<div class='column is-one-third'></div>
-    	<div class='column is-one-third message' ng-class="{'is-danger':currReqSong.problem, 'is-success':!currReqSong.problem}">
-    		<div class='message-header'>
-    			{{currReqSong.msg.title}}
-    		</div>
-    		<div class='message-body'>
-    			{{currReqSong.msg.body}}
-    			<br><br>
-    			<button class='button' style='bottom:5px;' ng-class="{'is-danger':currReqSong.problem, 'is-success':!currReqSong.problem}" ng-click='acceptReqResult();'>Okay</button>
-    		</div>
-    	</div>
-    	<div class='bg'></div>
+        <div class='column is-one-third'></div>
+        <div class='column is-one-third message' ng-class="{'is-danger':currReqSong.problem, 'is-success':!currReqSong.problem}">
+            <div class='message-header'>
+                {{currReqSong.msg.title}}
+            </div>
+            <div class='message-body'>
+                {{currReqSong.msg.body}}
+                <br>
+                <br>
+                <button class='button' style='bottom:5px;' ng-class="{'is-danger':currReqSong.problem, 'is-success':!currReqSong.problem}" ng-click='acceptReqResult();'>Okay</button>
+            </div>
+        </div>
+        <div class='bg'></div>
     </div>
     <script defer src="https://use.fontawesome.com/releases/v5.0.6/js/all.js"></script>
     <script src="/jquery/dist/jquery.min.js"></script>
