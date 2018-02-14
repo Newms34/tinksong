@@ -38,6 +38,14 @@
                                 </p>
                             </div>
                             <br>
+                            <p class="control is-size-4">Tabs</p>
+                            <div class="field">
+                                <span>test</span>
+                                <p class="control is-expanded">
+                                    <textarea class="textarea" ng-model='newSong.tabs' rows='10'></textarea>
+                                </p>
+                            </div>
+                            <br>
                             <p class="control is-size-4">Artist</p>
                             <div class="field">
                                 <p class="control is-expanded is-actually-full">
@@ -138,10 +146,10 @@
         <br>
         <div class='columns' id='song-panel'>
             <div class='column is-one-fifth'></div>
-            <div class='column is-three-fifths light-bg' ng-if='songs.length'>
+            <div class='column is-three-fifths light-bg'>
                 <div class='is-size-3'>Songs</div>
                 <hr>
-                <table class='table'>
+                <table class='table is-actually-full'>
                     <thead>
                         <tr>
                             <th>Title</th>
@@ -167,11 +175,23 @@
                             </td>
                             <td>{{td.reqd||0}}</td>
                             <td>
-                                <button class='button is-danger' ng-click='removeSong(sg.id)'>Remove</button>
+                                <button class='button is-info' ng-click='showTabs(sg)'><i class='fa fa-search'></i> View</button>
+                                <button class='button is-danger' ng-click='removeSong(sg.id)'><i class='fa fa-trash'></i> Remove</button>
                             </td>
                         </tr>
                     </tbody>
                 </table>
+            </div>
+        </div>
+        <div class='columns fixed-bit' ng-if='showingTabs' ng-click='hideTabs()'>
+            <div class='column is-one-third'></div>
+            <div class='column is-one-third'>
+                <div class='message' ng-click='$event.stopPropagation()'>
+                    <div class='is-size-4 message-header'>Tabs for song: {{cts.title}} <span class='button is-small is-danger' ng-click='hideTabs()'>x</span></div>
+                    <div class='message-body'>
+                        {{cts.tabs}}
+                    </div>
+                </div>
             </div>
         </div>
     </div>

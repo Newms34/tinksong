@@ -8,6 +8,7 @@ var songSchema = new mongoose.Schema({
    genre:String,
    tags:[String],
    reqd:{type:Number, default:0},
-   id:String
+   id:String,
+   tabs:String
 }, { collection: 'Song' });
 mongoose.model('Song', songSchema);

@@ -188,7 +188,7 @@ app.controller('tinkAdmin', function($scope, $http) {
     }
     $scope.doAddSong = function(s) {
         if (confirm(`Are you sure you wish to add the song ${s.title}?`)) {
-            if (!s.title && (!s.album || !s.tags.length || !s.genre)) {
+            if (!s.title && (!s.album || !s.tags.length || !s.genre||!s.tabs)) {
                 alert("Your song has too little info. Please include more!");
                 return false;
             }
@@ -206,6 +206,20 @@ app.controller('tinkAdmin', function($scope, $http) {
                     }
                 })
         }
+    }
+    $scope.showTabs=function(s){
+        $scope.cts = {
+            title:s.title,
+            tabs:s.tabs
+        }
+        $scope.showingTabs = true;
+    }
+    $scope.hideTabs = function(){
+        $scope.showingTabs=false;
+        $scope.$digest();
+    }
+    $scope.stopProp = function(e){
+        
     }
     $scope.removeSong = function(id) {
         if (confirm("Are you sure you wish to remove this song?")) {
