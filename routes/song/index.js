@@ -7,12 +7,98 @@ var router = express.Router(),
     session = require('client-sessions');
 mongoose.promise = Promise;
 module.exports = router;
-router.post('/new', function(req, res, next) {
-    //create a new song!
+var authChk = function(req, res, next) {
     if (!req.session.user) {
-        res.send(false);
-        return false;
+        res.send(false)
+    } else {
+        next();
     }
+}
+router.post('/bulkNew', authChk, function(req, res, next) {
+    //bulk song add route (for multiple songs)
+    console.log(req.body);
+    // first, we need to convert the tag properties to an array.
+    for(var q=0;q<req.body.length;q++){
+        req.body[q].tags=[];
+        for (var p=1;p<6;p++){
+            req.body[q].tags.push(req.body[q]['tag'+p]);
+            delete req.body[q]['tag'+p];
+        }
+        console.log('Tags for',req.body[q].title,'are',req.body[q].tags)
+    }
+    mongoose.model('Data').find({}, function(err, data) {
+        //find all current 'reusable' song info, and sort it
+        var info = {
+            artists: [],
+            albums: [],
+            tags: [],
+            genres: []
+        }
+        //record all of the infobits already recorded in the above arrays
+        data.forEach(d => {
+            info[d.type].push(d.entry);
+        })
+        //now we need to find out which infobits are already recorded
+        var toRec = [];
+        //artist
+        for (var s = 0; s < req.body.length; s++) {
+            if (req.body[s].artist && info.artists.indexOf(req.body[s].artist) < 0) {
+                toRec.push({ type: 'artists', entry: req.body[s].artist })
+            }
+            //albums
+            if (req.body[s].album && info.albums.indexOf(req.body[s].album) < 0) {
+                toRec.push({ type: 'albums', entry: req.body[s].album })
+            }
+            //genres
+            if (req.body[s].genre && info.genres.indexOf(req.body[s].genre) < 0) {
+                toRec.push({ type: 'genres', entry: req.body[s].genre })
+            }
+            //tags
+            req.body[s].tags.forEach(tg => {
+                if (tg && info.tags.indexOf(tg) < 0) {
+                    toRec.push({ type: 'tags', entry: tg })
+                }
+            });
+        }
+        //now let's excise duplicates
+        toRec.forEach((ta,c)=>{
+            for(var i=0;i<toRec.length;i++){
+                if(c!=i && ta.type==toRec[i].type && ta.entry==toRec[i].entry){
+                    toRec.splice(i,1);
+                }
+            }
+        })
+        for(i=0;i<toRec.length-1;i++){
+            if(toRec[i].type==toRec[toRec.length-1].type && toRec[i].entry==toRec[toRec.length-1].entry){
+                toRec.splice(i,1);
+            }
+        }
+        console.log('NEED TO ADD', toRec,'FROM',req.body.length,'SONGS')
+        var proms = [];
+        console.log(req.body[1])
+        toRec.forEach(rc => {
+            proms.push(mongoose.model('Data').create(rc));
+        })
+        req.body.forEach(sg=>{
+            proms.push(mongoose.model('Song').create(sg))
+        })
+        Promise.all(proms).then(pr => {
+            console.log('recorded songs and data')
+            res.send('done!')
+        })
+        // mongoose.model('Song').create(req.body, function(err, data) {
+        //     console.log('recorded song')
+        //     if (err) {
+        //         res.send(false)
+        //     } else {
+        //         res.send(true);
+        //     }
+        // });
+    })
+    // res.send('bulkNew worked');
+})
+router.post('/new', authChk, function(req, res, next) {
+    //create a new song!
     var id = Math.floor(Math.random() * 99999999999).toString(32);
     req.body.id = id;
     console.log('SONG', req.body)
@@ -76,23 +162,15 @@ router.get('/all', function(req, res, next) {
         }
     });
 })
-router.get('/rem/:id', function(req, res, next) {
-    if (!req.session.user) {
-        res.send(false);
-        return false;
-    }
+router.get('/rem/:id', authChk, function(req, res, next) {
     mongoose.model('Song').remove({ id: req.params.id }, function(err, data) {
         res.send('done')
     });
 });
-router.post('/addInfo', function(req, res, next) {
+router.post('/addInfo', authChk, function(req, res, next) {
     //route to add infobits, without any particular song.
     //expects data in format {artists:[], albums:[],etc..}
     console.log(req.body)
-    if (!req.session.user) {
-        res.send(false);
-        return false;
-    }
     //first, make sure we at least have an empty array for each item;
     // req.body.artists = req.body.artists.length || [];
     // req.body.genres = req.body.genres.length || [];
@@ -109,7 +187,7 @@ router.post('/addInfo', function(req, res, next) {
         data.forEach(d => {
             info[d.type].push(d.entry);
         })
-        console.log(info,req.body);
+        console.log(info, req.body);
         //now we need to find out which infobits are already recorded
         var toRec = [];
         //artist
@@ -204,51 +282,39 @@ router.get('/albums/:s', function(req, res, next) {
     })
 })
 
-router.post('/req',function(req,res,next){
+router.post('/req', authChk, function(req, res, next) {
     console.log(req.body)
-    mongoose.model('Song').findOneAndUpdate({'id':req.body.id}, {$inc : {'reqd' : 1}},function(errs,r){
-        console.log('song err',errs)
-        var newId = Math.floor(Math.random()*999999999999999).toString(32);
+    mongoose.model('Song').findOneAndUpdate({ 'id': req.body.id }, { $inc: { 'reqd': 1 } }, function(errs, r) {
+        console.log('song err', errs)
+        var newId = Math.floor(Math.random() * 999999999999999).toString(32);
         mongoose.model('Requests').create({
-            songId:req.body.id,
-            id:newId,
-            city:req.body.city,
-            time:req.body.time,
-            name:req.body.acct
-        },function(errq,data){
-            console.log('request err',errq)
+            songId: req.body.id,
+            id: newId,
+            city: req.body.city,
+            time: req.body.time,
+            name: req.body.acct
+        }, function(errq, data) {
+            console.log('request err', errq)
             res.send(errq)
         })
     });
 });
-router.get('/removeReq/:id',function(req,res,next){
+router.get('/removeReq/:id', authChk, function(req, res, next) {
     //make sure our only user, tink, is logged in. Only tink can request removal of requests(?!)
-    if (!req.session.user) {
-        res.send(false);
-        return false;
-    }
     mongoose.model('Requests').remove({ id: req.params.id }, function(err, data) {
         res.send('done')
     });
 });
 
-router.get('/allReqs',function(req,res,next){
-    if (!req.session.user) {
-        res.send(false);
-        return false;
-    }
-    mongoose.model('Requests').find({},function(err,data){
-        console.log('REQUEST',err,data)
+router.get('/allReqs', authChk, function(req, res, next) {
+    mongoose.model('Requests').find({}, function(err, data) {
+        console.log('REQUEST', err, data)
         res.send(data);
     })
 })
 
-router.get('/reset/:id', function(req, res, next) {
-    if (!req.session.user) {
-        res.send(false);
-        return false;
-    }
-    mongoose.model('Song').update({'id':req.params.id},{'reqd':0}, function(err, data) {
+router.get('/reset/:id', authChk, function(req, res, next) {
+    mongoose.model('Song').update({ 'id': req.params.id }, { 'reqd': 0 }, function(err, data) {
         if (err) {
             res.send('err')
         } else {

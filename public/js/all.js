@@ -5,6 +5,14 @@ app.controller('tinkCont', function($scope, $http) {
             if (r.data == 'err') {
                 return false;
             }
+            var i=0;
+            r.data.forEach(sg=>{
+                for(i=0;i<sg.tags.length;i++){
+                    sg.tags = sg.tags.filter(sgtg=>{
+                        return !!sgtg;
+                    })
+                }
+            })
             $scope.songs = r.data;
             $scope.filtSongs(null);
         })
@@ -70,8 +78,9 @@ app.controller('tinkCont', function($scope, $http) {
             console.log('filter',r)
             $scope.songsFilt = $scope.songs.filter(f=>{
                 r=r.toLowerCase();
-                return f.title.toLowerCase().indexOf(r)>-1 || f.genre.toLowerCase().indexOf(r)>-1 || f.album.toLowerCase().indexOf(r)>-1 || f.artist.toLowerCase().indexOf(r)>-1||f.tags.filter(ft=>{
-                    return ft.toLowerCase().indexOf(r)>-1;
+                console.log('examining song ',f)
+                return (f.title && f.title.toLowerCase().indexOf(r)>-1) || (f.genre && f.genre.toLowerCase().indexOf(r)>-1) || (f.album && f.album.toLowerCase().indexOf(r)>-1)|| (f.artist && f.artist.toLowerCase().indexOf(r)>-1)||f.tags.filter(ft=>{
+                    return ft && ft.toLowerCase().indexOf(r)>-1;
                 }).length;
             })
         }
